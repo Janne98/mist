@@ -8,7 +8,7 @@ dependencies:
 - rdkit=2021.03.*
 #- cudatoolkit=11.1 # may need to comment if cpu only
 - pytorch-lightning=1.6.* #1.7
-- pytorch::torchvision
+#- pytorch::torchvision
 - torchmetrics=0.4.*
 - einops
 - pip=21.2.*
