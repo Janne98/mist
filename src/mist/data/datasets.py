@@ -394,7 +394,7 @@ class SpectraMolMismatchHDFDataset(SpectraMolDataset):
         # .hdf5, _index.p
         # NOTE: Run an addt. script to uncompress
         hdf = f"{hdf_prefix}_sub.hdf5"
-        index_p = f"{hdf_prefix}_index_sub.p"
+        index_p = f"{hdf_prefix}_sub_index.p"
         self.pickled_tani_dists = f"{hdf_prefix}_precomputed_weights_sub.p"
 
         self.contrastive_loss = contrastive_loss

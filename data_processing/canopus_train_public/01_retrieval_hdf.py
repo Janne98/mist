@@ -8,7 +8,7 @@ import mist.retrieval_lib.make_hdf5 as make_hdf5
 import mist.retrieval_lib.form_subsets as form_subsets
 
 PUBCHEM_FILE = "data/raw/pubchem/cid_smiles.txt"
-PUBCHEM_FORMULA = "data/raw/pubchem/pubchem_formuale_inchikey.p"
+PUBCHEM_FORMULA = "data/raw/pubchem/pubchem_formulae_inchikey.p"
 num_workers = 20 
 
 if __name__=="__main__":

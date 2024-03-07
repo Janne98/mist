@@ -20,7 +20,7 @@ def read_smi_txt(smi_file, debug=False):
         for index, line in enumerate(fp):
             line = line.strip()
             if line:
-                smi = line.split("\t")[0].strip()
+                smi = line.split("\t")[1].strip()
                 smi_list.append(smi)
             if debug and index > 10000:
                 return smi_list
