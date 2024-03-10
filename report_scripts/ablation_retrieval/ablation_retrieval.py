@@ -1,9 +1,14 @@
+import argparse
 import subprocess
 from collections import defaultdict
 from pathlib import Path
 import shutil
 
-seed = 5
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--seed", default=1, type=int)
+args = parser.parse_args()
+seed = args.seed
 
 models = [
     ("full_model", f"results/ablation/ablation_retrieval{seed}/fp_full", f"results/ablation/ablation_retrieval{seed}/contrast_full"),
@@ -26,7 +31,7 @@ cosine_base_cmd = f"python3 run_scripts/retrieval_fp.py --dist-name cosine --lab
 contrast_base_cmd = f"python3 run_scripts/retrieval_contrastive.py --dataset-name {dataset} --hdf-prefix {hdf_prefix} --dist-name cosine"
 
 retrieval_results = []
-for model_name, fp_dir, contrast_dir in models:
+for model_name, fp_dir, contrast_dir in models: 
     print(f"Running {model_name}")
 
     num_workers = 0 # MacOS: num_workers must be 0
@@ -83,5 +88,5 @@ for model_name, fp_dir, contrast_dir in models:
 model_names = " ".join([i[0] for i in retrieval_results])
 retrieval_files = " ".join([str(i[1]) for i in retrieval_results])
 
-plot_cmd = f"python3 report_scripts/ablation_retrieval/retrieval_lineplots.py --retrieval-files {retrieval_files} --model-names {model_names} --save-dir results/ablation_retrieval{seed} --png"
+plot_cmd = f"python3 report_scripts/ablation_retrieval/retrieval_lineplots.py --retrieval-files {retrieval_files} --model-names {model_names} --save-dir results/ablation/ablation_retrieval{seed} --png"
 subprocess.call(plot_cmd, shell=True)
