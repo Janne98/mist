@@ -37,13 +37,3 @@ if __name__=="__main__":
         labels_name=LABELS_FILE,
         num_workers=num_workers
     )
-
-    # Subsample for contrastive learning
-    print("subsample for contrastive learning")
-    make_hdf5.subsample_with_weights(
-        hdf_prefix=f"data/paired_spectra/{DATASET_NAME}/retrieval_hdf/intpubchem_with_morgan4096_retrieval_db",
-        labels_file=f"data/paired_spectra/{DATASET_NAME}/{LABELS_FILE}",
-        fp_names=["morgan4096"],
-        debug=False,
-        num_workers=num_workers
-    )
