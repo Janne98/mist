@@ -1,3 +1,6 @@
+> [!NOTE]
+> This repository is a fork of the original MIST repository tailored for our reusability report. It includes a few bug fixes and introduces specific code for conducting reproducibility and reusability experiments, which can be found in the `report_scripts` directory.
+
 # 🌫️ MIST: Metabolite Inference with Spectrum Transformers
 
 [![DOI](https://zenodo.org/badge/564051299.svg)](https://zenodo.org/badge/latestdoi/564051299)  
