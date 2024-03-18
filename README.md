@@ -1,5 +1,10 @@
 > [!NOTE]
 > This repository is a fork of the original MIST repository tailored for our reusability report. It includes a few bug fixes and introduces specific code for conducting reproducibility and reusability experiments, which can be found in the `report_scripts` directory.
+> * `report_scripts/casmi_prep` contains scripts to process the CASMI 2022 dataset for usage with MIST.
+> * `report_scripts/reproducibility` contains scripts for reproducibility experiments
+> * `report_scripts/reusability` contains scripts for reusability experiments
+> * `report_scripts/ablation_retrieval` contains scripts for the database retrieval ablation study
+> * `report_scripts/create_csi_retrieval.ipynb` contains code to convert the output of CSI:FingerID to a pickle file containing the rank of the correct compounds. 
 
 # 🌫️ MIST: Metabolite Inference with Spectrum Transformers
 
