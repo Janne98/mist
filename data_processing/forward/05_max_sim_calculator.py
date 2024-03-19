@@ -5,6 +5,7 @@ set to try to filter down based upon tanimoto similarity
 
 """
 
+import argparse
 from pathlib import Path
 import pandas as pd
 import pickle
@@ -17,11 +18,27 @@ from tqdm import tqdm
 from functools import partial
 
 
+def get_args():
+    """get args"""
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument(
+        "--labels-file",
+        default="data/paired_spectra/csi2022/labels.tsv",
+    )
+    parser.add_argument(
+        "--unpaired-file",
+        default="data/unpaired_mols/bio_mols/all_smis_unfiltered.txt",
+    )
+    return parser.parse_args()
+
+
 def main():
 
     debug = False
-    labels_file = "data/paired_spectra/csi2022/labels.tsv"
-    unpaired_file = "data/unpaired_mols/bio_mols/all_smis_unfiltered.txt"
+    args = get_args()
+    labels_file = args.labels_file
+    unpaired_file = args.unpaired_file
     unpaired_file_path = Path(unpaired_file)
     dataset = Path(labels_file).parent.name
 
@@ -61,11 +78,15 @@ def main():
         temp_dict = dict(zip(test_smis, tani_max))
         return temp_dict
 
-    partial_fn = partial(batch_calculation, bank_fps=bank_fps, featurizer=featurizer)
+    partial_fn = partial(
+        batch_calculation, bank_fps=bank_fps, featurizer=featurizer
+    )
     batch_size = 500
     parallel_input = list(utils.batches(test_fp_smi_pairs, batch_size))
 
-    out_map_list = utils.chunked_parallel(parallel_input, partial_fn, max_cpu=10)
+    out_map_list = utils.chunked_parallel(
+        parallel_input, partial_fn, max_cpu=10
+    )
     out_map = {}
     for out_map_temp in out_map_list:
         out_map.update(out_map_temp)
