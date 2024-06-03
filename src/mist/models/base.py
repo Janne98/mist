@@ -310,6 +310,8 @@ class TorchModel(pl.LightningModule):
 
         # Test
         # List of losses
+        if not module.test_dataloader():
+            return None
         test_loss = trainer.test(self, module.test_dataloader())
         logging.info(test_loss)
         test_losses = test_loss

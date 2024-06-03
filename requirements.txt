@@ -10,3 +10,7 @@ CairoSVG
 #spec2vec # Baseline
 #ms2deepscore # Baseline
 #matchms # Baseline
+# Only on CalcUA cluster
+google-api-core==2.8.0
+googleapis-common-protos==1.56.0
+protobuf==3.20.0

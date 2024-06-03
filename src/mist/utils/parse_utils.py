@@ -43,6 +43,8 @@ def parse_spectra(spectra_file: str) -> Tuple[dict, List[Tuple[str, np.ndarray]]
                 peak_data = np.vstack(peak_data)
                 # Add new tuple
                 spectras.append((spectra_header, peak_data))
+            else:
+                print(f"Warning: empty spectrum: {spectra_file}")
         # Get meta data
         else:
             entries = {}

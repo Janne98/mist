@@ -132,9 +132,15 @@ def process_spec_file(meta, tuples, precision=4, max_inten=0.001, max_peaks=60):
             else:
                 pass
 
+    if len(new_tuples) < 1:
+        print("Warning: Empty tuples list")
     merged_spec = np.vstack(new_tuples)
     merged_spec = merged_spec[merged_spec[:, 0] <= (parentmass + 1)]
-    merged_spec[:, 1] = merged_spec[:, 1] / merged_spec[:, 1].max()
+    if merged_spec[:, 1].size > 0:
+        merged_spec[:, 1] = merged_spec[:, 1] / merged_spec[:, 1].max()
+    else:
+        print("Warning: No peaks <= parentmass + 1 ")
+        return None
 
     # Sqrt intensities here
     merged_spec[:, 1] = np.sqrt(merged_spec[:, 1])
@@ -311,7 +317,5 @@ def get_output_dict(
     # All the MS2 subpeaks in these erroneous MS2 files has mz larger than parentmass
     output_dict = {"cand_form": form, "cand_ion": ion_type, "output_tbl": None}
     if spec is not None and ion_type in ION_LST:
-        output_dict = assign_subforms(
-            form, spec, ion_type, mass_diff_thresh=mass_diff_thresh
-        )
+        output_dict = assign_subforms(form, spec, ion_type, mass_diff_thresh=mass_diff_thresh)
     return output_dict

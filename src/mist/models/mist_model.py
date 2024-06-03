@@ -10,6 +10,10 @@ from mist.models.base import TorchModel, register_model
 from mist.models import modules
 
 
+def cosine_loss(x, y):
+    cosine_sim = torch.nn.CosineSimilarity(dim=-1)
+    return 1 - cosine_sim(x.expand(y.shape), y.float()).unsqueeze(-1)
+
 @register_model
 class MistNet(TorchModel):
     def __init__(
@@ -63,9 +67,7 @@ class MistNet(TorchModel):
         self.loss_name = loss_fn
 
         cosine_sim = torch.nn.CosineSimilarity(dim=-1)
-        self.cosine_loss = lambda x, y: 1 - cosine_sim(
-            x.expand(y.shape), y.float()
-        ).unsqueeze(-1)
+        self.cosine_loss = cosine_loss
 
         if self.loss_name == "bce":
             self.loss_fn = self.bce_loss

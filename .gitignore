@@ -26,6 +26,7 @@ spec2vec*
 *.hdf5
 scratch
 configs/debug/
+quickstart/model_predictions
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

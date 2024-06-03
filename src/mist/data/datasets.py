@@ -816,7 +816,7 @@ class SpecDataModule(pl.LightningDataModule):
 
     def test_dataloader(self):
         """test_dataloader."""
-        if len(self.test) == 0:
+        if self.test is None or len(self.test) == 0:
             return None
         return SpecDataModule.get_paired_loader(
             self.test,

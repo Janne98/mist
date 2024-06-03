@@ -60,9 +60,10 @@ def run_training():
     val_dataset = datasets.SpectraMolDataset(
         spectra_mol_list=val, featurizer=paired_featurizer, **kwargs
     )
-    test_dataset = datasets.SpectraMolDataset(
-        spectra_mol_list=test, featurizer=paired_featurizer, **kwargs
-    )
+#    test_dataset = datasets.SpectraMolDataset(
+#        spectra_mol_list=test, featurizer=paired_featurizer, **kwargs
+#    )
+    test_dataset = None
     spec_dataloader_module = datasets.SpecDataModule(
         train_dataset, val_dataset, test_dataset, **kwargs
     )
@@ -83,8 +84,9 @@ def run_training():
     )
 
     # for each dict, add split name
-    for j in test_loss:
-        j.update({"split_name": split_name})
+    if test_loss:
+        for j in test_loss:
+            j.update({"split_name": split_name})
 
     # Export train dataset names
     all_train_spec_names = [

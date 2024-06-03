@@ -141,6 +141,8 @@ def assign_subforms(spec_files, labels_file,
         input_specs = list(zip(spec_names, input_specs))
     elif spec_files.is_dir():
         spec_fn_lst = labels_df["spec"].to_list()
+        print(f"Processing {len(spec_fn_lst)} files")
+        print(spec_files)
         proc_spec_full = partial(
             process_spec_file,
             spec_files=spec_files,
@@ -155,7 +157,9 @@ def assign_subforms(spec_files, labels_file,
         raise ValueError(f"Spec files arg {spec_files} is not a dir or mgf")
 
     # input_specs contains a list of tuples (spec, subpeak tuple array)
+    print(f"{len(input_specs)} input spectra in {spec_files}")
     input_specs_dict = {tup[0]: tup[1] for tup in input_specs}
+    print(f"Number of values that are not None: {sum(value is not None for value in input_specs_dict.values())}")
     export_dicts, spec_names = [], []
     for _, row in labels_df.iterrows():
         spec = str(row["spec"])
@@ -181,11 +185,13 @@ def assign_subforms(spec_files, labels_file,
         )
     assert len(export_dicts) == len(output_dict_lst)
 
+    print(f"Number of empty export dicts: {sum(1 for ed in export_dicts if not ed)}")
     # Write all output jsons to files
     for output_dict, spec_name in tqdm(zip(output_dict_lst, spec_names)):
-        with open(output_dir / f"{spec_name}.json", "w") as f:
-            json.dump(output_dict, f, indent=4)
-            f.close()
+        if output_dict:
+            with open(output_dir / f"{spec_name}.json", "w") as f:
+                json.dump(output_dict, f, indent=4)
+                f.close()
 
 if __name__ == "__main__":
     args = get_args()

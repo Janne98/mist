@@ -58,7 +58,10 @@ def magma_augmentation(
     spectra_adduct = spec_to_adduct.get(spectra_name, None)
 
     # Step 1 - Generate fragmentations inside fragmentation engine
-    fe = fragmentation.FragmentEngine(mol_str=spectra_smiles, **FRAGMENT_ENGINE_PARAMS)
+    try:
+        fe = fragmentation.FragmentEngine(mol_str=spectra_smiles, **FRAGMENT_ENGINE_PARAMS)
+    except:
+        return
 
     # Outside try except loop
     if debug:

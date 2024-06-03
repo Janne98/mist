@@ -20,6 +20,7 @@ def simple_parallel(
     use_ray
 
     """
+
     # If ray is required. Set to false.
     if use_ray and False:
         import ray
