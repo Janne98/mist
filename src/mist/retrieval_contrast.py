@@ -3,6 +3,7 @@
 This serves as the entry point to evaluate mass spec retrieval model
 
 """
+
 import copy
 from pathlib import Path
 import logging
@@ -22,15 +23,20 @@ from mist import utils
 def get_args():
     """get args"""
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model-ckpt", required=True, help="Model ckpt to load from")
+    parser.add_argument(
+        "--model-ckpt", required=True, help="Model ckpt to load from"
+    )
     parser.add_argument(
         "--dataset-name",
         required=False,
         help="Name of test dataset",
     )
-    parser.add_argument("--save-dir", required=False, default=None, help="Save dir")
-    parser.add_argument("--out-name", required=False, default=None,
-                        help="Save name")
+    parser.add_argument(
+        "--save-dir", required=False, default=None, help="Save dir"
+    )
+    parser.add_argument(
+        "--out-name", required=False, default=None, help="Save name"
+    )
     parser.add_argument(
         "--hdf-prefix",
         help="HDF Prefix to use for querying retrieval.",
@@ -50,7 +56,11 @@ def get_args():
         help="Settings for how to subset the dataset",
     )
     parser.add_argument(
-        "--num-workers", action="store", type=int, help="Get num workers", default=16
+        "--num-workers",
+        action="store",
+        type=int,
+        help="Get num workers",
+        default=16,
     )
     parser.add_argument("--debug", default=False, action="store_true")
     parser.add_argument("--gpu", default=False, action="store_true")
@@ -143,7 +153,9 @@ def run_contrastive_retrieval():
     kwargs = base_params
 
     utils.setup_logger(
-        save_dir, log_name=f"retrieval_hdf.log", debug=kwargs.get("debug", False)
+        save_dir,
+        log_name=f"retrieval_hdf.log",
+        debug=kwargs.get("debug", False),
     )
 
     # Construct model and load in state dict
@@ -159,7 +171,9 @@ def run_contrastive_retrieval():
     paired_featurizer = featurizers.get_paired_featurizer(**kwargs)
 
     # Get dataset objects
-    spectra_mol_pairs = datasets.get_paired_spectra(allow_none_smiles=True, **kwargs)
+    spectra_mol_pairs = datasets.get_paired_spectra(
+        allow_none_smiles=True, **kwargs
+    )
     spectra_mol_pairs = list(zip(*spectra_mol_pairs))
 
     # Subset down to appropriate names
@@ -175,14 +189,18 @@ def run_contrastive_retrieval():
         logging.info(f"Subset to test of split {split}")
         valid_names = set(split_df["name"][split_df[split] == "test"].values)
         spectra_mol_pairs = [
-            (i, j) for i, j in spectra_mol_pairs if i.get_spec_name() in valid_names
+            (i, j)
+            for i, j in spectra_mol_pairs
+            if i.get_spec_name() in valid_names
         ]
     else:
         pass
 
     # Create dataset
     test_dataset = datasets.SpectraMolDataset(
-        spectra_mol_list=spectra_mol_pairs, featurizer=paired_featurizer, **kwargs
+        spectra_mol_list=spectra_mol_pairs,
+        featurizer=paired_featurizer,
+        **kwargs,
     )
     dist_fn = get_dist_fn(dist_name)
     label_to_formula = {
@@ -214,7 +232,11 @@ def run_contrastive_retrieval():
         model = model.eval()
         for spectra_batch in tqdm(test_loader):
             spectra_batch = {
-                k: v.to(device=device, non_blocking=True) if hasattr(v, "to") else v
+                k: (
+                    v.to(device=device, non_blocking=True)
+                    if hasattr(v, "to")
+                    else v
+                )
                 for k, v in spectra_batch.items()
             }
 
@@ -237,13 +259,17 @@ def run_contrastive_retrieval():
 
         # Get hdf entries
         formulas_temp = [label_to_formula.get(name) for name in name_sub]
-        formula_dicts_temp = [pickled_indices.get(formula) for formula in formulas_temp]
+        formula_dicts_temp = [
+            pickled_indices.get(formula) for formula in formulas_temp
+        ]
 
         # Extract hdf fingerprint
         def get_decoy_fps(formula_dict):
             if formula_dict is None or len(formula_dict) == 0:
                 return []
-            offset, length = formula_dict.get("offset"), formula_dict.get("length")
+            offset, length = formula_dict.get("offset"), formula_dict.get(
+                "length"
+            )
             pubchem_hdf = h5py.File(hdf_file_name, "r")
             fps = pubchem_hdf["fingerprints"]
             outs = fps[offset : offset + length]
@@ -253,20 +279,24 @@ def run_contrastive_retrieval():
         logging.info("Extracting fingerprint  for batch of size 1000")
         num_workers = kwargs.get("num_workers")
         if num_workers == 0:
-            fps_from_hdf = [get_decoy_fps(form_temp) for form_temp in formula_dicts_temp]
+            fps_from_hdf = [
+                get_decoy_fps(form_temp) for form_temp in formula_dicts_temp
+            ]
         else:
             fps_from_hdf = utils.chunked_parallel(
                 formula_dicts_temp,
                 get_decoy_fps,
                 chunks=100,
-                max_cpu=num_workers
+                max_cpu=num_workers,
             )
 
         # Encode all hdf fp's with single model
         fp_list = np.vstack([i for i in fps_from_hdf if len(i) > 0])
 
         # Get the HDF entries for each of these
-        fp_loader = torch.utils.data.DataLoader(fp_list, batch_size=128, shuffle=False)
+        fp_loader = torch.utils.data.DataLoader(
+            fp_list, batch_size=128, shuffle=False
+        )
         encoded_mols = []
         logging.info("Encoding mols")
         with torch.no_grad():
@@ -283,7 +313,9 @@ def run_contrastive_retrieval():
         # Create list that is: 1. pred, offset, list
         cur_offset = 0
         tuples = []
-        for name, pred, formula_dict in zip(name_sub, spec_sub, formula_dicts_temp):
+        for name, pred, formula_dict in zip(
+            name_sub, spec_sub, formula_dicts_temp
+        ):
             if formula_dict is None or len(formula_dict) == 0:
                 tuples.append(None)
                 continue
@@ -309,7 +341,10 @@ def run_contrastive_retrieval():
             temp_rankings = [ranked_retrieval(i) for i in tuples]
         else:
             temp_rankings = utils.chunked_parallel(
-                tuples, ranked_retrieval, chunks=100, max_cpu=kwargs.get("num_workers")
+                tuples,
+                ranked_retrieval,
+                chunks=100,
+                max_cpu=kwargs.get("num_workers"),
             )
         temp_rankings, temp_dists = zip(*temp_rankings)
         entry_rankings.extend(temp_rankings)
@@ -324,7 +359,7 @@ def run_contrastive_retrieval():
 
     # Dump to output file
     ctr = 0
-    save_name = kwargs.get('out_name', None)
+    save_name = kwargs.get("out_name", None)
     if save_name is not None:
         f_name = Path(save_dir) / save_name
     else:
